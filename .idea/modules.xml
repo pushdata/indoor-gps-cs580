@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/IndoorGPS.iml" filepath="$PROJECT_DIR$/IndoorGPS.iml" />
+      <module fileurl="file://$PROJECT_DIR$/1-indoor-gps-cs580.iml" filepath="$PROJECT_DIR$/1-indoor-gps-cs580.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

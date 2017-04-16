@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">Indoor GPS</string>
-    <string name="textview">Location</string>
-    <string name="button">Scan</string>
-    <string name="button1">Stop Scan</string>
-    <string name="textview1">Not Scanning</string>
-    <string name="scan">Started Scanning</string>
-    <string name="stopscan">Stopped Scanning</string>
+    <string name="location">Location</string>
+    <string name="scan">Scan</string>
+    <string name="train_model">Train Model</string>
+    <string name="scan_off">Not Scanning</string>
+    <string name="scan_start">Started Scanning</string>
+    <string name="scan_stop">Stopped Scanning</string>
 </resources>
