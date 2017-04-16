@@ -2,6 +2,8 @@
     <string name="app_name">Indoor GPS</string>
     <string name="textview">Location</string>
     <string name="button">Scan</string>
+    <string name="button1">Stop Scan</string>
     <string name="textview1">Not Scanning</string>
-    <string name="scan">Scanning</string>
+    <string name="scan">Started Scanning</string>
+    <string name="stopscan">Stopped Scanning</string>
 </resources>
