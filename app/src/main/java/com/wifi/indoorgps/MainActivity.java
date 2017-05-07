@@ -14,8 +14,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
 
-public class MainActivity extends MapActivity {
+public class MainActivity extends GraphActivity {
 
+    public final static String  EXTRA_MESSAGE_FLOOR = "com.wifi.indoorgps.FLOOR";
     public static final int SCAN_DELAY = 1000;
     public static final int SCAN_INTERVAL = 1000;
     public static final int MAX_SCAN_THREADS = 2;

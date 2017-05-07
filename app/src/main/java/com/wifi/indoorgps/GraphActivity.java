@@ -20,13 +20,15 @@ import java.util.List;
 
 //MapActivity
 
-public class MapActivity extends Activity implements OnTouchListener {
+public class GraphActivity extends Activity implements OnTouchListener {
+
     private static final int MENU_ITEM_CHOOSE_FLOOR = 1;
     private static final int MENU_ITEM_BASEMENT = 2;
     protected WifiManager wifi;
     protected BroadcastReceiver receiver;
     protected FingerprintManager application;
     protected String areaSelected;
+    protected FloorMap mMap;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -81,6 +83,15 @@ public class MapActivity extends Activity implements OnTouchListener {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void refreshMap() {
+        mMap.invalidate(); // redraws the map screen
+    }
+
+    public void setMap(int resId) {
+        areaSelected = String.valueOf(resId);
+        mMap.setImageResource(resId); // change map image
     }
 }
 
