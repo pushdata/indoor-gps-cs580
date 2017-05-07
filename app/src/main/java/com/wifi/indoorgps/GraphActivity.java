@@ -28,12 +28,14 @@ public class GraphActivity extends Activity implements OnTouchListener {
     protected BroadcastReceiver receiver;
     protected FingerprintManager application;
     protected String areaSelected;
-    protected FloorMap mMap;
+    protected FloorMap fMap;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        fMap = (FloorMap) findViewById(R.id.floorMap);
+        fMap.setOnTouchListener(this);
         application = (FingerprintManager) getApplication();
         wifi = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
     }
@@ -79,6 +81,7 @@ public class GraphActivity extends Activity implements OnTouchListener {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case MENU_ITEM_BASEMENT:
+                setMap(R.drawable.basement);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -86,12 +89,12 @@ public class GraphActivity extends Activity implements OnTouchListener {
     }
 
     public void refreshMap() {
-        mMap.invalidate(); // redraws the map screen
+        fMap.invalidate(); // redraws the map screen
     }
 
     public void setMap(int resId) {
         areaSelected = String.valueOf(resId);
-        mMap.setImageResource(resId); // change map image
+        fMap.setImageResource(resId); // change map image
     }
 }
 

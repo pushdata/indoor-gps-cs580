@@ -13,34 +13,34 @@ import android.view.View;
 
 public class WifiCapture extends View{
 
-    private static final int COLOR_INACTIVE = Color.RED;
-    private static final int COLOR_ACTIVE = Color.GREEN;
+    private static final int INACTIVE_COLOR = Color.RED;
+    private static final int ACTIVE_COLOR = Color.GREEN;
 
     private Model mFingerprint;
 
-    private boolean mActive;
+    private boolean floorMapActive;
 
     private Paint  mPaint; // draw color
 
-    private PointF mLocation; // location on screen
+    private PointF floorMapLocation; // location on screen
     private float mRadius; // circle radius
 
     // placeholders for calculated screen positions
-    private float mRelativeX, mRelativeY;
+    private float RelativeXCoord, RelativeYCoord;
 
-    private boolean mVisible;
+    private boolean floorMapVisible;
 
     public WifiCapture(Context context) {
         super(context);
         mPaint = new Paint();
-        mPaint.setColor(COLOR_INACTIVE);
+        mPaint.setColor(INACTIVE_COLOR);
         mPaint.setTextSize(25);
         mPaint.setAntiAlias(true);
 
-        mActive = false;
-        mVisible = true;
+        floorMapActive = false;
+        floorMapVisible = true;
         mRadius = 10f;
-        mLocation = new PointF(0,0);
+        floorMapLocation = new PointF(0, 0);
         mFingerprint = null;
     }
 
@@ -51,55 +51,53 @@ public class WifiCapture extends View{
     }
 
     protected void drawWithTransformations(Canvas canvas, float[] matrixValues) {
-        mRelativeX = matrixValues[2] + mLocation.x * matrixValues[0];
-        mRelativeY = matrixValues[5] + mLocation.y * matrixValues[4];
+        RelativeXCoord = matrixValues[2] + floorMapLocation.x * matrixValues[0];
+        RelativeYCoord = matrixValues[5] + floorMapLocation.y * matrixValues[4];
 
-        if(mVisible == true) { // draw only if set visible
-            if(mActive) { // choose draw color based on active state
-                mPaint.setColor(COLOR_ACTIVE);
+        if (floorMapVisible == true) { // draw only if set visible
+            if (floorMapActive) { // choose draw color based on active state
+                mPaint.setColor(ACTIVE_COLOR);
             } else {
-                mPaint.setColor(COLOR_INACTIVE);
+                mPaint.setColor(INACTIVE_COLOR);
             }
 
-            canvas.drawCircle(mRelativeX, mRelativeY, mRadius, mPaint);
+            canvas.drawCircle(RelativeXCoord, RelativeYCoord, mRadius, mPaint);
         }
     }
 
-    public void setLocation(PointF location) {
-        mLocation = location;
+    public PointF getLocation() {
+        return floorMapLocation;
     }
 
-    public PointF getLocation() {
-        return mLocation;
+    public void setLocation(PointF location) {
+        floorMapLocation = location;
     }
 
     public void setSize(float radius) {
         mRadius = radius;
     }
 
-    public void setFingerprint(Model fingerprint) {
-        mFingerprint = fingerprint;
-        mLocation = fingerprint.getLocation();
-    }
-
     public Model getFingerprint() {
         return mFingerprint;
     }
 
+    public void setFingerprint(Model fingerprint) {
+        mFingerprint = fingerprint;
+        floorMapLocation = fingerprint.getLocation();
+    }
+
     public void activate() {
-        mActive = true;
+        floorMapActive = true;
     }
 
     public void deactivate() {
-        mActive = false;
+        floorMapActive = false;
     }
 
     public void setVisible(boolean visible) {
-        mVisible = visible;
+        floorMapVisible = visible;
     }
 
-    public boolean isVisible() {
-        return mVisible;
-    }
+
 }
 

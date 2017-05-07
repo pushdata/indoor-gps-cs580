@@ -17,34 +17,26 @@ import java.util.ArrayList;
 
 public class FloorMap extends ImageView {
 
-    // We can be in one of these 3 states
-    private static final int MAP_STATE_NONE = 0;
-    private static final int MAP_STATE_DRAG = 1;
-    private static final int MAP_STATE_ZOOM = 2;
+    private static final int MAP_TOUCHED = 1;
 
-    // These matrices will be used to move and zoom image
+    //Matrices for capturing X Y coordinates
     private Matrix mMatrix = new Matrix();
     private Matrix mSavedMatrix = new Matrix();
 
-    private int mode = MAP_STATE_NONE;
+    //Current Touch State
+    private int mode = 0;
 
-    // Remember some things for zooming
     private PointF mStart = new PointF();
-    private PointF mid = new PointF();
-    float mOldDist = 1f;
 
     private ArrayList<WifiCapture> mWifiPoints;
-
 
 
     /** CONSTRUCTORS */
 
     public FloorMap(Context context, AttributeSet attrs) {
         super(context, attrs);
-
         mWifiPoints = new ArrayList<WifiCapture>();
     }
-
 
 
     /** INSTANCE METHODS */
@@ -56,34 +48,21 @@ public class FloorMap extends ImageView {
         float[] values = new float[9];
         mMatrix.getValues(values);
 
-        // draw all visible "fingerprints"
         for(WifiCapture point : mWifiPoints) {
             point.drawWithTransformations(canvas, values);
         }
     }
 
-
-    /**
-     * Map moving and zooming
-     */
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         super.onTouchEvent(event);
 
-        // Handle touch events here...
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
                 onTouchStart(event);
                 break;
-            case MotionEvent.ACTION_POINTER_DOWN:
-                onMultiTouchStart(event);
-                break;
             case MotionEvent.ACTION_UP:
-                onTouchEnd(event);
-                break;
-            case MotionEvent.ACTION_POINTER_UP:
-                onMultiTouchEnd(event);
+                onTouchEnd();
                 break;
             case MotionEvent.ACTION_MOVE:
                 onTouchMove(event);
@@ -95,82 +74,28 @@ public class FloorMap extends ImageView {
 
     public void onTouchStart(MotionEvent event) {
         mSavedMatrix.set(mMatrix);
-        mStart.set(event.getX(), event.getY()); // save the location where touch started
-        mode = MAP_STATE_DRAG;
+        mStart.set(event.getX(), event.getY());
+        mode = MAP_TOUCHED;
     }
 
-    public void onTouchEnd(MotionEvent event) {
-        mode = MAP_STATE_NONE;
-    }
-
-    public void onMultiTouchStart(MotionEvent event) {
-        mOldDist = spacing(event);
-
-        // start zoom mode if touch points are spread far enough from each other
-        if (mOldDist > 10f) {
-            mSavedMatrix.set(mMatrix);
-            midPoint(mid, event);
-            mode = MAP_STATE_ZOOM;
-        }
-    }
-
-    public void onMultiTouchEnd(MotionEvent event) {
-        mSavedMatrix.set(mMatrix);
-        mode = MAP_STATE_DRAG;
+    public void onTouchEnd() {
+        mode = MAP_TOUCHED;
     }
 
     public void onTouchMove(MotionEvent event) {
-        if (mode == MAP_STATE_DRAG) {
             mapMove(event);
-        }
-        else if (mode == MAP_STATE_ZOOM) {
-            mapZoom(event);
-        }
+
     }
 
+    //Set matrix with translated coordinates
     public void mapMove(MotionEvent event) {
         mMatrix.set(mSavedMatrix);
-        mMatrix.postTranslate(event.getX() - mStart.x, event.getY() - mStart.y); // translates map
+        mMatrix.postTranslate(event.getX() - mStart.x, event.getY() - mStart.y);
         setImageMatrix(mMatrix);
     }
 
-    public void mapZoom(MotionEvent event) {
-        float newDist = spacing(event);
 
-        // zoom in/out if touch points are spread far enough from each other
-        if (newDist > 10f) {
-            mMatrix.set(mSavedMatrix);
-            float scale = newDist / mOldDist;
-            mMatrix.postScale(scale, scale, mid.x, mid.y); // zoom in/out
-            setImageMatrix(mMatrix);
-        }
-    }
-
-    /**
-     * Helper methods for zoom functionality
-     */
-
-    /** Determine the space between the first two fingers */
-    private float spacing(MotionEvent event) {
-        float x = event.getX(0) - event.getX(1);
-        float y = event.getY(0) - event.getY(1);
-        return (float)Math.sqrt(x * x + y * y);
-    }
-
-    /** Calculate the mid point of the first two fingers */
-    private void midPoint(PointF point, MotionEvent event) {
-        float x = event.getX(0) + event.getX(1);
-        float y = event.getY(0) + event.getY(1);
-        point.set(x / 2, y / 2);
-    }
-
-
-
-    /**
-     * Functions for creating new WifiPointViews
-     */
-
-    /** create new WifiPointView to given location */
+    //Return WifiCapture object with filled details
     public WifiCapture createNewWifiPointOnMap(PointF location) {
         WifiCapture wpView = new WifiCapture(getContext());
         float[] values = new float[9];
@@ -181,7 +106,7 @@ public class FloorMap extends ImageView {
         return wpView;
     }
 
-    /** create new WifiPointView and bind it to given fingerprint */
+    //Bind to fingerprint
     public WifiCapture createNewWifiPointOnMap(Model fingerprint) {
         WifiCapture wpView = new WifiCapture(getContext());
         wpView.setFingerprint(fingerprint);
@@ -189,7 +114,7 @@ public class FloorMap extends ImageView {
         return wpView;
     }
 
-    /** create new WifiPointView, bind it to given fingerprint and set its visibility*/
+    //Place a marker on the MAP and set the pointer to GREEN
     public WifiCapture createNewWifiPointOnMap(Model fingerprint, boolean visible) {
         WifiCapture wpView = createNewWifiPointOnMap(fingerprint);
         wpView.setVisible(visible);
@@ -205,10 +130,6 @@ public class FloorMap extends ImageView {
         location.set((location.x - values[2]) / values[0], (location.y - values[5]) / values[4]);
         pointer.setLocation(location);
     }
-
-    /**
-     * Functions for modifying the ArrayList of all WifiPointViews on the map
-     */
 
     public ArrayList<WifiCapture> getWifiPoints() {
         return mWifiPoints;

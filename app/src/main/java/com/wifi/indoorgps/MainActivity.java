@@ -1,5 +1,6 @@
 package com.wifi.indoorgps;
 
+import android.content.Intent;
 import android.net.wifi.ScanResult;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,18 +17,20 @@ import java.util.TreeSet;
 
 public class MainActivity extends GraphActivity {
 
-    public final static String  EXTRA_MESSAGE_FLOOR = "com.wifi.indoorgps.FLOOR";
-    public static final int SCAN_DELAY = 1000;
-    public static final int SCAN_INTERVAL = 1000;
     public static final int MAX_SCAN_THREADS = 2;
+    public final static String TRACK_FLOOR = "floor";
     private static Handler handler = new Handler();
+    Integer currentReading;
+    Integer previousReading;
+    Timer timer;
+    TimerTask myTimerTask;
+    private boolean trainMode = false;
     private int threadCount = 0;
     private Runnable refreshArea = new Runnable() {
         public void run() {
+            refreshMap();
         }
     };
-
-    private boolean threadPaused = false;
 
     private HashMap<String, Integer> readings;
 
@@ -37,29 +40,27 @@ public class MainActivity extends GraphActivity {
         setContentView(R.layout.activity_main);
         readings = new HashMap<String, Integer>();
 
-        Timer timer = new Timer();
+        timer = new Timer();
 
-        timer.schedule(new TimerTask() {
-
+        myTimerTask = new TimerTask() {
             @Override
             public void run() {
-                if (threadPaused == false) {
+                if (trainMode == false)
                     wifi.startScan();
-                }
             }
-
-        }, SCAN_DELAY, SCAN_INTERVAL);
+        };
+        timer.schedule(myTimerTask, 1000, 1000);
     }
 
     public void onResume() {
         super.onResume();
 
-        threadPaused = false;
+        trainMode = false;
     }
 
     public void onPause() {
         super.onPause();
-        threadPaused = true;
+        trainMode = true;
     }
 
     @Override
@@ -82,15 +83,15 @@ public class MainActivity extends GraphActivity {
                     keys.addAll(measurements.keySet());
 
                     for (String key : keys) {
-                        Integer value = measurements.get(key);
-                        Integer oldValue = readings.get(key);
-                        if (oldValue == null) {
-                            readings.put(key, value);
-                        } else if (value == null) {
+                        currentReading = measurements.get(key);
+                        previousReading = readings.get(key);
+                        if (previousReading == null) {
+                            readings.put(key, currentReading);
+                        } else if (currentReading == null) {
                             readings.remove(key);
                         } else {
-                            value = (int) (oldValue * 0.4f + value * 0.6f);
-                            readings.put(key, value);
+                            currentReading = (int) (previousReading * 0.4f + currentReading * 0.6f);
+                            readings.put(key, currentReading);
                         }
                     }
 
@@ -109,6 +110,9 @@ public class MainActivity extends GraphActivity {
     }
 
     public void startTrainActivity() {
+        Intent intent = new Intent(MainActivity.this, TrainActivity.class);
+        intent.putExtra(TRACK_FLOOR, areaSelected);
+        startActivity(intent);
     }
 
     @Override
@@ -122,7 +126,7 @@ public class MainActivity extends GraphActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case 21:
-                Toast.makeText(getApplicationContext(), "Traning Activity Called", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Training Activity Called", Toast.LENGTH_LONG).show();
                 startTrainActivity();
                 return true;
             default:

@@ -54,7 +54,7 @@ public class TrainActivity extends GraphActivity {
         super.onCreate(savedInstanceState);
 
         Intent intent = getIntent();
-        String floor = intent.getStringExtra(MainActivity.EXTRA_MESSAGE_FLOOR);
+        String floor = intent.getStringExtra(MainActivity.TRACK_FLOOR);
         setMap(Integer.valueOf(floor));
 
         setTitle(getTitle() + " (edit mode)");
@@ -103,7 +103,7 @@ public class TrainActivity extends GraphActivity {
 
                     Model f = new Model(mMeasurements, areaSelected); // create fingerprint with the calculated measurement averages
                     f.setLocation(mPointer.getLocation()); // set the fingerprint to UI pointer location
-                    mMap.createNewWifiPointOnMap(f, mShowFingerprints); // add to map UI
+                    fMap.createNewWifiPointOnMap(f, mShowFingerprints); // add to map UI
 
                     application.addFingerprint(f); // add to database
                     mLoadingDialog.dismiss(); // hide loading bar
@@ -130,10 +130,10 @@ public class TrainActivity extends GraphActivity {
 
                     // add pointer on screen where the user tapped and start wifi scan
                     if(mPointer == null) {
-                        mPointer = mMap.createNewWifiPointOnMap(location);
+                        mPointer = fMap.createNewWifiPointOnMap(location);
                         mPointer.activate();
                     } else {
-                        mMap.setWifiPointViewPosition(mPointer, location);
+                        fMap.setWifiPointViewPosition(mPointer, location);
                     }
                     refreshMap(); // redraw map
                 }
@@ -207,7 +207,7 @@ public class TrainActivity extends GraphActivity {
 
     public void setFingerprintVisibility(boolean visible) {
         mShowFingerprints = visible;
-        mMap.setWifiPointsVisibility(visible);
+        fMap.setWifiPointsVisibility(visible);
 
         if (mPointer != null) {
             mPointer.setVisible(true); // pointer is always visible
@@ -225,7 +225,7 @@ public class TrainActivity extends GraphActivity {
         // add yes button to dialog
         alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog,int id) {
-                mMap.deleteFingerprints(); // delete fingerprints from the screen
+                fMap.deleteFingerprints(); // delete fingerprints from the screen
                 application.deleteAllFingerprints(areaSelected); // delete fingerprints from the database
             }
         });
@@ -245,13 +245,13 @@ public class TrainActivity extends GraphActivity {
     @Override
     public void setMap(int resId) {
         super.setMap(resId);
-        mMap.deleteFingerprints(); // clear screen from fingerprints
+        fMap.deleteFingerprints(); // clear screen from fingerprints
 
         ArrayList<Model> fingerprints = application.getFingerprintData(areaSelected); // load fingerprints from the database
 
         // add WifiPointViews on map with fingerprint data loaded from the database
         for(Model fingerprint : fingerprints) {
-            mMap.createNewWifiPointOnMap(fingerprint, mShowFingerprints);
+            fMap.createNewWifiPointOnMap(fingerprint, mShowFingerprints);
         }
 
     }
