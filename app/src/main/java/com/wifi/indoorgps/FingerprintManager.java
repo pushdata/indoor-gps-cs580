@@ -7,50 +7,54 @@ import java.util.ArrayList;
 //Fingerprint Manager
 
 public class FingerprintManager extends Application {
-    private ArrayList<Model> fingerprints;
-
+    ArrayList<Model> fingerprintsToRemove = null;
+    private ArrayList<Model> fingerprints = null;
+    private ResultDB db;
 
     @Override
     public void onCreate() {
         super.onCreate();
         fingerprints = new ArrayList<Model>();
+        db = new ResultDB(this);
     }
 
-
-    public void addFingerprint(Model Model) {
-        fingerprints.add(Model);
-    }
-
-    public void deleteAllFingerprints() {
-        fingerprints.clear();
-    }
-
-    public void deleteAllFingerprints(String map) {
-        ArrayList<Model> itemsToRemove = new ArrayList<Model>();
-        for (Model Model : fingerprints) {
-            if (Model.getMap().compareTo(map) == 0) {
-                itemsToRemove.add(Model);
-            }
-        }
-
-        for (Model Model : itemsToRemove) {
-            fingerprints.remove(Model); // delete from arraylist
-        }
+    public void addFingerprint(Model model) {
+        fingerprints.add(model);
+        db.addFingerprint(model);
     }
 
     public ArrayList<Model> getFingerprintData(String map) {
-        ArrayList<Model> fingerprints = new ArrayList<Model>();
-        for (Model Model : fingerprints) {
+        ArrayList<Model> fingerprintData = new ArrayList<Model>();
+        for (Model Model : fingerprintData) {
             if (Model.getMap().compareTo(map) == 0) {
                 fingerprints.add(Model);
             }
         }
-
         return fingerprints;
     }
 
     public ArrayList<Model> getFingerprintData() {
-
         return fingerprints;
+    }
+
+    public void getFingerprintsFromDatabase() {
+        fingerprints = db.getAllFingerprints();
+    }
+
+    public void deleteAllFingerprints() {
+        db.deleteAllFingerprints();
+        fingerprints.clear();
+    }
+
+    public void deleteAllFingerprints(String map) {
+        fingerprintsToRemove = new ArrayList<Model>();
+        for (Model model : fingerprints) {
+            if (model.getMap().compareTo(map) == 0) {
+                fingerprintsToRemove.add(model);
+            }
+        }
+        for (Model model : fingerprintsToRemove) {
+            fingerprints.remove(model);
+        }
     }
 }

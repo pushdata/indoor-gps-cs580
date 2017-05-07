@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "262443552187",
+    "firebase_url": "https://indoor-gps-f0550.firebaseio.com",
+    "project_id": "indoor-gps-f0550",
+    "storage_bucket": "indoor-gps-f0550.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:262443552187:android:b032c8d49b214ffd",
+        "android_client_info": {
+          "package_name": "com.wifi.indoorgps"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "262443552187-3l365b1et9t6e6e17h4jfnap4nk8sr2c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBDFN3vB13jpkUiSEzP_7iE1I8G6R9XrpE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

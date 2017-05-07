@@ -54,7 +54,6 @@ public class MainActivity extends GraphActivity {
 
     public void onResume() {
         super.onResume();
-
         trainMode = false;
     }
 
