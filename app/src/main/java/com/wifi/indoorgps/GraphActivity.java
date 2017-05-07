@@ -30,6 +30,7 @@ public class GraphActivity extends Activity implements OnTouchListener {
     protected String areaSelected;
     protected FloorMap fMap;
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,7 +43,6 @@ public class GraphActivity extends Activity implements OnTouchListener {
 
     public void onStart() {
         super.onStart();
-
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context c, Intent intent) {
@@ -50,12 +50,10 @@ public class GraphActivity extends Activity implements OnTouchListener {
 
             }
         };
-
         registerReceiver(receiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
     }
 
     public void onReceiveWifiScanResults(List<ScanResult> results) {
-
     }
 
     public boolean onTouch(View v, MotionEvent event) {

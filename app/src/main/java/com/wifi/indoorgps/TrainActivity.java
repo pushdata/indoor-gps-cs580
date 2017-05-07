@@ -1,11 +1,9 @@
 package com.wifi.indoorgps;
 
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PointF;
 import android.net.wifi.ScanResult;
-import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -217,29 +215,8 @@ public class TrainActivity extends GraphActivity {
     }
 
     public void deleteAllFingerprints() {
-        // create alert dialog and delete all fingerprints only after user has confirmed he wants to delete them
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setTitle("Are you sure?");
-        alertDialogBuilder.setMessage("Are sure you want to delete all fingerprints?");
-
-        // add yes button to dialog
-        alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog,int id) {
                 fMap.deleteFingerprints(); // delete fingerprints from the screen
                 application.deleteAllFingerprints(areaSelected); // delete fingerprints from the database
-            }
-        });
-
-        // add no button to dialog
-        alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog,int id) {
-                dialog.cancel(); // close the dialog and do nothing
-            }
-        });
-
-        // create the dialog and show it
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
     }
 
     @Override

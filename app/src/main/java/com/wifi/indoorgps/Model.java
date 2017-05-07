@@ -14,7 +14,6 @@ public class Model {
     float bestResult = -1;
     HashMap<String, Integer> readings;
     private int id;
-    private int value = 0;
     private String location;
 
     public Model() {
@@ -87,12 +86,12 @@ public class Model {
         keys.addAll(fingerprintMeasurements.keySet());
 
         for (String key : keys) {
-            int x = 0;
-            value = 0;
+            int value = 0;
             Integer fValue = fingerprintMeasurements.get(key);
             Integer mValue = readings.get(key);
-            x = getValue(fValue, mValue);
-            result += x * x;
+            value = (fValue == null) ? -119 : (int) fValue;
+            value -= (mValue == null) ? -119 : (int) mValue;
+            result += value * value;
 
         }
         return result;
@@ -113,21 +112,5 @@ public class Model {
         }
         return closest;
     }
-
-    public int getValue(Integer f, Integer m) {
-        if (f == null) {
-            value = -119;
-        } else {
-            value = (int) f;
-        }
-        if (f == null) {
-            value = -119;
-        } else {
-            value = value - (int) m;
-        }
-        return value;
-    }
-
-
 
 }
