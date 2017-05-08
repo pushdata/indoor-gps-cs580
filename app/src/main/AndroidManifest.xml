@@ -27,6 +27,7 @@
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" >
     </uses-permission>
 
+
     <application
             android:name=".FingerprintManager"
         android:allowBackup="true"
