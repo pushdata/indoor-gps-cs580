@@ -31,6 +31,7 @@ public class FingerprintManager extends Application {
             }
         }
         return fingerprints;
+
     }
 
     public ArrayList<Model> getFingerprintData() {
@@ -57,4 +58,6 @@ public class FingerprintManager extends Application {
             fingerprints.remove(model);
         }
     }
+
+
 }
