@@ -1,7 +1,6 @@
 package com.wifi.indoorgps;
 
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.PointF;
 import android.net.wifi.ScanResult;
 import android.os.Bundle;
