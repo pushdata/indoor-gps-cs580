@@ -1,12 +1,11 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:background="@drawable/basement">
+    android:layout_height="fill_parent">
 
     <com.wifi.indoorgps.FloorMap
         android:id="@+id/floorMap"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:scaleType="matrix"
-        android:src="@drawable/basement" />
+        android:src="@mipmap/basement"
+        android:scaleType="matrix"/>
 </FrameLayout>

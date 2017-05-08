@@ -25,7 +25,6 @@ public class TrainActivity extends GraphActivity {
     private static final int MENU_ITEM_SHOW_FINGERPRINTS = 33;
     private static final int MENU_ITEM_DELETE_FINGERPRINTS = 34;
     private static final int MENU_ITEM_EXIT = 35;
-
     private static final int MIN_SCAN_COUNT = 3; // minimum amount of scans required the scan to be successful
     private static final int SCAN_COUNT = 3; // how many scans will be done for calculating average for scan results
     private static final int SCAN_INTERVAL = 500; // interval between scans (milliseconds)
@@ -39,7 +38,7 @@ public class TrainActivity extends GraphActivity {
 
     private ProgressDialog mLoadingDialog; // loading bar which is shown while scanning access points
 
-    private HashMap<String, Integer> mMeasurements; // for storing measurement data during the scan
+    private HashMap<String, Integer> readings; // for storing measurement data during the scan
 
     private boolean mShowFingerprints = true;
 
@@ -54,8 +53,7 @@ public class TrainActivity extends GraphActivity {
         Intent intent = getIntent();
         String floor = intent.getStringExtra(MainActivity.TRACK_FLOOR);
         setMap(Integer.valueOf(floor));
-
-        setTitle(getTitle() + " (edit mode)");
+        setTitle(getTitle() + " Training Mode ");
     }
 
     @Override
@@ -72,20 +70,20 @@ public class TrainActivity extends GraphActivity {
 
                 TreeSet<String> keys = new TreeSet<String>();
                 keys.addAll(measurements.keySet());
-                keys.addAll(mMeasurements.keySet());
+                keys.addAll(readings.keySet());
 
                 // go through scans results and calculate new sum values for each measurement
                 for (String key : keys) {
                     Integer value = measurements.get(key);
-                    Integer oldValue = mMeasurements.get(key);
+                    Integer oldValue = readings.get(key);
 
                     // calculate new value for each measurement (sum of all part-scans)
                     if(oldValue == null) {
-                        mMeasurements.put(key, value + (-119 * (SCAN_COUNT - 1 - mScansLeft)));
+                        readings.put(key, value + (-119 * (SCAN_COUNT - 1 - mScansLeft)));
                     } else if(value == null) {
-                        mMeasurements.put(key, -119 + oldValue);
+                        readings.put(key, -119 + oldValue);
                     } else {
-                        mMeasurements.put(key, value + oldValue);
+                        readings.put(key, value + oldValue);
                     }
                 }
 
@@ -94,16 +92,16 @@ public class TrainActivity extends GraphActivity {
                     scanNext();
                 } else { // calculate averages from sum values of measurements and add them to fingerprint
                     // calculate average for each measurement
-                    for (String key : mMeasurements.keySet()) {
-                        int value = (int) mMeasurements.get(key) / SCAN_COUNT;
-                        mMeasurements.put(key, value);
+                    for (String key : readings.keySet()) {
+                        int value = (int) readings.get(key) / SCAN_COUNT;
+                        readings.put(key, value);
                     }
 
-                    Model f = new Model(mMeasurements, areaSelected); // create fingerprint with the calculated measurement averages
+                    Model f = new Model(readings, areaSelected); // create fingerprint with the calculated measurement averages
                     f.setLocation(mPointer.getLocation()); // set the fingerprint to UI pointer location
-                    fMap.createNewWifiPointOnMap(f, mShowFingerprints); // add to map UI
+                    mMap.createNewWifiPointOnMap(f, mShowFingerprints); // add to map UI
 
-                    application.addFingerprint(f); // add to database
+                    mApplication.addFingerprint(f); // add to database
                     mLoadingDialog.dismiss(); // hide loading bar
                 }
             } else { // did not find enough access points, show error to user
@@ -128,10 +126,10 @@ public class TrainActivity extends GraphActivity {
 
                     // add pointer on screen where the user tapped and start wifi scan
                     if(mPointer == null) {
-                        mPointer = fMap.createNewWifiPointOnMap(location);
+                        mPointer = mMap.createNewWifiPointOnMap(location);
                         mPointer.activate();
                     } else {
-                        fMap.setWifiPointViewPosition(mPointer, location);
+                        mMap.setWifiPointViewPosition(mPointer, location);
                     }
                     refreshMap(); // redraw map
                 }
@@ -149,8 +147,7 @@ public class TrainActivity extends GraphActivity {
         SubMenu sub = menu.addSubMenu(Menu.NONE, MENU_ITEM_FINGERPRINTS, Menu.NONE, "Fingerprints");
         sub.add(Menu.NONE, MENU_ITEM_SHOW_FINGERPRINTS, Menu.NONE, (mShowFingerprints ? "Hide fingerprints" : "Show fingerprints"));
         sub.add(Menu.NONE, MENU_ITEM_DELETE_FINGERPRINTS, Menu.NONE, "Delete all fingerprints");
-
-        menu.add(Menu.NONE, MENU_ITEM_EXIT, Menu.NONE, "Exit edit mode");
+        menu.add(Menu.NONE, MENU_ITEM_EXIT, Menu.NONE, "Exit Training mode");
         super.onCreateOptionsMenu(menu); // items for changing map
         return true;
     }
@@ -185,7 +182,7 @@ public class TrainActivity extends GraphActivity {
 
     public void startScan() {
         mScansLeft = SCAN_COUNT;
-        mMeasurements = new HashMap<String, Integer>();
+        readings = new HashMap<String, Integer>();
         mLoadingDialog = ProgressDialog.show(this, "", "Scanning..", true); // show loading bar
         wifi.startScan();
     }
@@ -205,7 +202,7 @@ public class TrainActivity extends GraphActivity {
 
     public void setFingerprintVisibility(boolean visible) {
         mShowFingerprints = visible;
-        fMap.setWifiPointsVisibility(visible);
+        mMap.setWifiPointsVisibility(visible);
 
         if (mPointer != null) {
             mPointer.setVisible(true); // pointer is always visible
@@ -215,20 +212,20 @@ public class TrainActivity extends GraphActivity {
     }
 
     public void deleteAllFingerprints() {
-                fMap.deleteFingerprints(); // delete fingerprints from the screen
-                application.deleteAllFingerprints(areaSelected); // delete fingerprints from the database
+        mMap.deleteFingerprints(); // delete fingerprints from the screen
+                mApplication.deleteAllFingerprints(areaSelected); // delete fingerprints from the database
     }
 
     @Override
     public void setMap(int resId) {
         super.setMap(resId);
-        fMap.deleteFingerprints(); // clear screen from fingerprints
+        mMap.deleteFingerprints(); // clear screen from fingerprints
 
-        ArrayList<Model> fingerprints = application.getFingerprintData(areaSelected); // load fingerprints from the database
+        ArrayList<Model> fingerprints = mApplication.getFingerprintData(areaSelected); // load fingerprints from the database
 
         // add WifiPointViews on map with fingerprint data loaded from the database
         for(Model fingerprint : fingerprints) {
-            fMap.createNewWifiPointOnMap(fingerprint, mShowFingerprints);
+            mMap.createNewWifiPointOnMap(fingerprint, mShowFingerprints);
         }
 
     }

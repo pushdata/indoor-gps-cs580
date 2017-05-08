@@ -1,6 +1,8 @@
 package com.wifi.indoorgps;
 
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.PointF;
 import android.net.wifi.ScanResult;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,29 +18,32 @@ import java.util.TimerTask;
 import java.util.TreeSet;
 
 public class MainActivity extends GraphActivity {
-
-    public static final int MAX_SCAN_THREADS = 2;
-    public final static String TRACK_FLOOR = "floor";
-    private static Handler handler = new Handler();
     Integer currentReading;
     Integer previousReading;
+    private boolean trainMode = false;
+    private HashMap<String, Integer> readings;
     Timer timer;
     TimerTask myTimerTask;
-    private boolean trainMode = false;
+    public final static String TRACK_FLOOR = "com.inte.indoorpositiontracker.FLOOR";
+    public static final int MAX_SCAN_THREADS = 2;
     private int threadCount = 0;
-    private Runnable refreshArea = new Runnable() {
+    private WifiCapture pointer;
+    private static Handler handler = new Handler();
+
+    private Runnable mRefreshMap = new Runnable() {
         public void run() {
             refreshMap();
         }
     };
 
-    private HashMap<String, Integer> readings;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+
         readings = new HashMap<String, Integer>();
+
+        pointer = mMap.createNewWifiPointOnMap(new PointF(-1000, -1000));
+        pointer.activate();
 
         timer = new Timer();
 
@@ -59,6 +64,7 @@ public class MainActivity extends GraphActivity {
 
     public void onPause() {
         super.onPause();
+
         trainMode = true;
     }
 
@@ -66,8 +72,7 @@ public class MainActivity extends GraphActivity {
     public void onReceiveWifiScanResults(final List<ScanResult> results) {
         FingerprintManager application = (FingerprintManager) getApplication();
         final ArrayList<Model> fingerprints = application.getFingerprintData(areaSelected);
-
-        if (results.size() > 0 && fingerprints.size() > 0 && threadCount <= MAX_SCAN_THREADS) {
+        if(results.size() > 0 && fingerprints.size() > 0 && threadCount <= MAX_SCAN_THREADS) {
             Thread t = new Thread() {
                 public void run() {
                     threadCount++;
@@ -82,11 +87,11 @@ public class MainActivity extends GraphActivity {
                     keys.addAll(measurements.keySet());
 
                     for (String key : keys) {
-                        currentReading = measurements.get(key);
-                        previousReading = readings.get(key);
-                        if (previousReading == null) {
+                         currentReading = measurements.get(key);
+                         previousReading = readings.get(key);
+                        if(previousReading == null) {
                             readings.put(key, currentReading);
-                        } else if (currentReading == null) {
+                        } else if(currentReading == null) {
                             readings.remove(key);
                         } else {
                             currentReading = (int) (previousReading * 0.4f + currentReading * 0.6f);
@@ -94,12 +99,13 @@ public class MainActivity extends GraphActivity {
                         }
                     }
 
-
                     Model f = new Model(readings);
 
                     Model closestMatch = f.getClosestMatch(fingerprints);
 
-                    handler.post(refreshArea);
+                    pointer.setFingerprint(closestMatch);
+
+                    handler.post(mRefreshMap);
 
                     threadCount--;
                 }
