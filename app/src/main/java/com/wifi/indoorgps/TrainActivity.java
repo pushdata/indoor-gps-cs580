@@ -94,7 +94,7 @@ public class TrainActivity extends GraphActivity {
                 } else { // calculate averages from sum values of measurements and add them to fingerprint
                     // calculate average for each measurement
                     for (String key : readings.keySet()) {
-                        int value = (int) readings.get(key); // SCAN_COUNT;
+                        int value = (int) readings.get(key) / SCAN_COUNT;
                         readings.put(key, value);
                     }
 
