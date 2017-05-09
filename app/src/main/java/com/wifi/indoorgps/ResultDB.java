@@ -16,7 +16,7 @@ public class ResultDB extends SQLiteOpenHelper {
     public static final String FINGERPRINTS_TABLE = "fingerprints";
     public static final String READINGS_TABLE = "readings";
     public static final String FINGERPRINTS_TABLE_CREATE = "CREATE TABLE 'fingerprints' "
-            + "('fid' INTEGER PRIMARY KEY,'location_name' TEXT NOT NULL,'x_co' FLOAT, 'y_co' FLOAT )";
+            + "('fid' INTEGER PRIMARY KEY,'location_name' TEXT NOT NULL,'x_co' FLOAT, 'y_co' FLOAT,'room_name' TEXT NOT NULL)";
 
     public static final String READINGS_TABLE_CREATE = "CREATE TABLE 'readings' "
             + "('rid' INTEGER PRIMARY KEY ,'fid' INTEGER ,'ssid' TEXT NOT NULL ,'rssi' INTEGER NOT NULL)";
@@ -66,6 +66,7 @@ public class ResultDB extends SQLiteOpenHelper {
         cv.put("location_name", fingerprint.getMap());
         cv.put("x_co", location.x);
         cv.put("y_co", location.y);
+        cv.put("room_name", fingerprint.getLocation_name());
         Map<String, Integer> measurements;
         long fingerprintId = db.insert(FINGERPRINTS_TABLE, null, cv);
 
@@ -90,16 +91,16 @@ public class ResultDB extends SQLiteOpenHelper {
         Model fingerprint = null;
         HashMap<String, Integer> measurements = null;
         String[] values = new String[]{String.valueOf(id)};
-
         Cursor cursor = db.query(FINGERPRINTS_TABLE,
-                new String[]{"fid", "location_name", "x_co", "y_co"},
+                new String[]{"fid", "location_name", "x_co", "y_co", "room_name"},
                 "fid=?", values, null, null, null, null);
 
         if (cursor.moveToFirst()) {
             PointF point = new PointF(cursor.getFloat(2), cursor.getFloat(3));
             String location = cursor.getString(1);
+            String room_name = cursor.getString(4);
             measurements = getMeasurements(id);
-            fingerprint = new Model(id, location, point, measurements);
+            fingerprint = new Model(id, location, point, measurements, room_name);
         }
         cursor.close();
         db.close();
@@ -117,8 +118,9 @@ public class ResultDB extends SQLiteOpenHelper {
             int id = cursor.getInt(0);
             String location = cursor.getString(1);
             PointF point = new PointF(cursor.getFloat(2), cursor.getFloat(3));
+            String room_name = cursor.getString(4);
             measurements = getMeasurements(id);
-            fingerprint = new Model(id, location, point, measurements);
+            fingerprint = new Model(id, location, point, measurements, room_name);
             fingerprints.add(fingerprint);
             cursor.moveToNext();
         }

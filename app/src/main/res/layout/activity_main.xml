@@ -6,6 +6,6 @@
         android:id="@+id/floorMap"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:src="@mipmap/basement"
-        android:scaleType="matrix"/>
+        android:scaleType="matrix"
+        android:src="@mipmap/floor" />
 </FrameLayout>

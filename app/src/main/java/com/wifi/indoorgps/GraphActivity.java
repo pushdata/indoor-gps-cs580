@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.widget.ImageView;
 
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class GraphActivity extends Activity implements OnTouchListener {
 
         mApplication = (FingerprintManager) getApplication();
         wifi = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        this.setMap(R.mipmap.basement); // set map to default location (== first floor)
+        this.setMap(R.mipmap.floor); // set map to default location (== first floor)
     }
 
     public void onStart() {
@@ -92,6 +93,7 @@ public class GraphActivity extends Activity implements OnTouchListener {
     public void setMap(int resId) {
         areaSelected = String.valueOf(resId);
         mMap.setImageResource(resId); // change map image
+        mMap.setScaleType(ImageView.ScaleType.FIT_XY);
     }
 }
 

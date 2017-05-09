@@ -13,32 +13,42 @@ public class Model {
     PointF locationPoint;
     float bestResult = -1;
     HashMap<String, Integer> readings;
+    private String location_name = "";
     private int id;
     private String location;
-
     public Model() {
         id = 0;
         location = "";
     }
-
     public Model(HashMap<String, Integer> measurements) {
         this();
         readings = measurements;
     }
 
-    public Model(HashMap<String, Integer> measurements, String map) {
+    public Model(HashMap<String, Integer> measurements, String map, String room_name) {
         this(measurements);
         location = map;
+        location_name = room_name;
     }
 
-    public Model(int id, String map, PointF location) {
+    public Model(int id, String map, PointF location, String room_name) {
         this();
         locationPoint = location;
+        location_name = room_name;
+
     }
 
-    public Model(int id, String map, PointF location, HashMap<String, Integer> measurements) {
-        this(id, map, location);
+    public Model(int id, String map, PointF location, HashMap<String, Integer> measurements, String room_name) {
+        this(id, map, location, room_name);
         readings = measurements;
+    }
+
+    public String getLocation_name() {
+        return location_name;
+    }
+
+    public void setLocation_name(String location_name) {
+        this.location_name = location_name;
     }
 
     public int getId() {

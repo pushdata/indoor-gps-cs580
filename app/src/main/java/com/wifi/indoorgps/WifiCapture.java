@@ -1,8 +1,12 @@
 package com.wifi.indoorgps;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.view.View;
@@ -15,19 +19,17 @@ public class WifiCapture extends View{
 
     private static final int INACTIVE_COLOR = Color.RED;
     private static final int ACTIVE_COLOR = Color.GREEN;
-
+    float x, y;
+    float width = 100.0f;
+    float height = 100.0f;
     private Model mFingerprint;
-
+    private String location_name;
     private boolean floorMapActive;
-
     private Paint  mPaint; // draw color
-
     private PointF floorMapLocation; // location on screen
     private float mRadius; // circle radius
-
     // placeholders for calculated screen positions
     private float RelativeXCoord, RelativeYCoord;
-
     private boolean floorMapVisible;
 
     public WifiCapture(Context context) {
@@ -42,6 +44,14 @@ public class WifiCapture extends View{
         mRadius = 10f;
         floorMapLocation = new PointF(0, 0);
         mFingerprint = null;
+    }
+
+    public String getLocation_name() {
+        return location_name;
+    }
+
+    public void setLocation_name(String location_name) {
+        this.location_name = location_name;
     }
 
     @Override
@@ -60,11 +70,31 @@ public class WifiCapture extends View{
             } else {
                 mPaint.setColor(INACTIVE_COLOR);
             }
-
-            canvas.drawCircle(RelativeXCoord, RelativeYCoord, mRadius, mPaint);
+            Resources res = getResources();
+            Bitmap bitmap = BitmapFactory.decodeResource(res, R.drawable.human);
+            bitmap = getResizedBitmap(bitmap, 150, 100);
+            canvas.drawBitmap(bitmap, RelativeXCoord, RelativeYCoord, mPaint);
+            //canvas.drawRect(RelativeXCoord, RelativeYCoord, RelativeXCoord+width, RelativeYCoord+height, mPaint);
+            //canvas.drawCircle(RelativeXCoord, RelativeYCoord, mRadius, mPaint);
         }
     }
 
+    public Bitmap getResizedBitmap(Bitmap bm, int newWidth, int newHeight) {
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+        // CREATE A MATRIX FOR THE MANIPULATION
+        Matrix matrix = new Matrix();
+        // RESIZE THE BIT MAP
+        matrix.postScale(scaleWidth, scaleHeight);
+
+        // "RECREATE" THE NEW BITMAP
+        Bitmap resizedBitmap = Bitmap.createBitmap(
+                bm, 0, 0, width, height, matrix, false);
+        bm.recycle();
+        return resizedBitmap;
+    }
     public PointF getLocation() {
         return floorMapLocation;
     }
@@ -82,6 +112,7 @@ public class WifiCapture extends View{
     }
 
     public void setFingerprint(Model fingerprint) {
+        location_name = fingerprint.getLocation_name();
         mFingerprint = fingerprint;
         floorMapLocation = fingerprint.getLocation();
     }

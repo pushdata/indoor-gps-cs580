@@ -1,10 +1,12 @@
 package com.wifi.indoorgps;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.PointF;
 import android.net.wifi.ScanResult;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Vibrator;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -17,18 +19,21 @@ import java.util.TimerTask;
 import java.util.TreeSet;
 
 public class MainActivity extends GraphActivity {
-    Integer currentReading;
-    Integer previousReading;
-    private boolean trainMode = false;
-    private HashMap<String, Integer> readings;
-    Timer timer;
-    TimerTask myTimerTask;
+    public final static String BED_ROOM = "bedroom";
+    public final static String KITCHEN = "kitchen";
+    public final static String HALL = "hall";
     public final static String TRACK_FLOOR = "com.inte.indoorpositiontracker.FLOOR";
     public static final int MAX_SCAN_THREADS = 2;
+    private static Handler handler = new Handler();
+    public boolean initialScan = false;
+    Integer currentReading;
+    Integer previousReading;
+    Timer timer;
+    TimerTask myTimerTask;
+    private boolean trainMode = false;
+    private HashMap<String, Integer> readings;
     private int threadCount = 0;
     private WifiCapture pointer;
-    private static Handler handler = new Handler();
-
     private Runnable mRefreshMap = new Runnable() {
         public void run() {
             refreshMap();
@@ -38,9 +43,7 @@ public class MainActivity extends GraphActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         readings = new HashMap<String, Integer>();
-
         pointer = mMap.createNewWifiPointOnMap(new PointF(-1000, -1000));
         pointer.activate();
 
@@ -70,8 +73,14 @@ public class MainActivity extends GraphActivity {
     @Override
     public void onReceiveWifiScanResults(final List<ScanResult> results) {
         FingerprintManager application = (FingerprintManager) getApplication();
-        final ArrayList<Model> fingerprints = application.getFingerprintData(areaSelected);
+        final ArrayList<Model> fingerprints;
+        //= application.getFingerprintData(areaSelected);
+        if (initialScan == true) {
+            application.getFingerprintsFromDatabase();
+        }
+        fingerprints = application.getFingerprintData();
         if(results.size() > 0 && fingerprints.size() > 0 && threadCount <= MAX_SCAN_THREADS) {
+
             Thread t = new Thread() {
                 public void run() {
                     threadCount++;
@@ -106,6 +115,8 @@ public class MainActivity extends GraphActivity {
 
                     handler.post(mRefreshMap);
 
+                    showLocation(closestMatch.getLocation_name());
+
                     threadCount--;
                 }
             };
@@ -113,7 +124,31 @@ public class MainActivity extends GraphActivity {
         }
     }
 
+    public void showLocation(final String location_name) {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                Vibrator v = getVObject();
+                Toast.makeText(MainActivity.this, location_name, Toast.LENGTH_SHORT).show();
+                if (location_name.equalsIgnoreCase(BED_ROOM)) {
+                    long[] pattern = new long[]{0, 100, 1000};
+                    v.vibrate(pattern, -1);
+                } else if (location_name.equalsIgnoreCase(HALL)) {
+                    long[] pattern = new long[]{0, 1000, 1000};
+                    v.vibrate(pattern, -1);
+                } else if (location_name.equalsIgnoreCase(KITCHEN)) {
+                    long[] pattern = new long[]{0, 100, 1000};
+                    v.vibrate(pattern, -1);
+                }
+            }
+        });
+    }
+
+    public Vibrator getVObject() {
+        return (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+    }
+
     public void startTrainActivity() {
+        getVObject().cancel();
         Intent intent = new Intent(MainActivity.this, TrainActivity.class);
         intent.putExtra(TRACK_FLOOR, areaSelected);
         startActivity(intent);
@@ -122,6 +157,7 @@ public class MainActivity extends GraphActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
+        menu.add(Menu.NONE, 20, Menu.NONE, "Get Location");
         menu.add(Menu.NONE, 21, Menu.NONE, "Train Model");
         return true;
     }
@@ -129,6 +165,10 @@ public class MainActivity extends GraphActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case 20:
+                trainMode = false;
+                initialScan = true;
+                return true;
             case 21:
                 Toast.makeText(getApplicationContext(), "Training Activity Called", Toast.LENGTH_LONG).show();
                 startTrainActivity();
