@@ -136,7 +136,7 @@ public class MainActivity extends GraphActivity {
                     long[] pattern = new long[]{0, 1000, 1000};
                     v.vibrate(pattern, -1);
                 } else if (location_name.equalsIgnoreCase(KITCHEN)) {
-                    long[] pattern = new long[]{0, 100, 1000};
+                    long[] pattern = new long[]{0, 400, 1000};
                     v.vibrate(pattern, -1);
                 }
             }
@@ -159,6 +159,7 @@ public class MainActivity extends GraphActivity {
         super.onCreateOptionsMenu(menu);
         menu.add(Menu.NONE, 20, Menu.NONE, "Get Location");
         menu.add(Menu.NONE, 21, Menu.NONE, "Train Model");
+        menu.add(Menu.NONE, 22, Menu.NONE, "Tutorial Page");
         return true;
     }
 
@@ -172,6 +173,10 @@ public class MainActivity extends GraphActivity {
             case 21:
                 Toast.makeText(getApplicationContext(), "Training Activity Called", Toast.LENGTH_LONG).show();
                 startTrainActivity();
+                return true;
+            case 22:
+                Intent intent = new Intent(MainActivity.this, Usage.class);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

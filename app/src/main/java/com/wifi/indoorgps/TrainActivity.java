@@ -88,7 +88,6 @@ public class TrainActivity extends GraphActivity {
                     }
                 }
 
-
                 if(mScansLeft > 0) { // keep on scanning
                     scanNext();
                 } else { // calculate averages from sum values of measurements and add them to fingerprint
