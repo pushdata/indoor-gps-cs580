@@ -11,7 +11,6 @@ import java.util.TreeSet;
 
 public class Model {
     PointF locationPoint;
-    float bestResult = -1;
     HashMap<String, Integer> readings;
     private String location_name = "";
     private int id;
@@ -87,6 +86,7 @@ public class Model {
         readings = measurements;
     }
 
+    //Compare the Fingerprint Provided
     public float compare(Model Model) {
         float result = 0f;
 
@@ -107,6 +107,7 @@ public class Model {
         return result;
     }
 
+    //Get the closest Fingerprint Data
     public Model getClosestMatch(ArrayList<Model> fingerprints) {
         Model closest = null;
         float bestScore = -1;

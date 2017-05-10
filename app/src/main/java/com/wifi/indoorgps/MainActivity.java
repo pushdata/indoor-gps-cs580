@@ -40,6 +40,7 @@ public class MainActivity extends GraphActivity {
         }
     };
 
+    //Create Timer to schedule wifi scanning at certain intervals
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,11 +71,11 @@ public class MainActivity extends GraphActivity {
         trainMode = true;
     }
 
+    //Invoked upon receiving wifi scan results
     @Override
     public void onReceiveWifiScanResults(final List<ScanResult> results) {
         FingerprintManager application = (FingerprintManager) getApplication();
         final ArrayList<Model> fingerprints;
-        //= application.getFingerprintData(areaSelected);
         if (initialScan == true) {
             application.getFingerprintsFromDatabase();
         }
@@ -124,6 +125,7 @@ public class MainActivity extends GraphActivity {
         }
     }
 
+    //Show Location Toast and Trigger Location Specific Vibration Pattern
     public void showLocation(final String location_name) {
         runOnUiThread(new Runnable() {
             public void run() {
@@ -143,10 +145,12 @@ public class MainActivity extends GraphActivity {
         });
     }
 
+    //Get Vibrator Object which is invoked from Thread
     public Vibrator getVObject() {
         return (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
     }
 
+    //Start Training Mode
     public void startTrainActivity() {
         getVObject().cancel();
         Intent intent = new Intent(MainActivity.this, TrainActivity.class);
@@ -154,6 +158,7 @@ public class MainActivity extends GraphActivity {
         startActivity(intent);
     }
 
+    //Create Options Menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
@@ -166,6 +171,7 @@ public class MainActivity extends GraphActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            //Get current location when App is launched after killed
             case 20:
                 trainMode = false;
                 initialScan = true;

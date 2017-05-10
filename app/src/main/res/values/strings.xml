@@ -6,4 +6,5 @@
     <string name="scan_off">Not Scanning</string>
     <string name="scan_start">Started Scanning</string>
     <string name="scan_stop">Stopped Scanning</string>
+    <string name="usage_page" translatable="false">Press the buttons below to activate the vibration pattern. The same pattern will be triggered when the user is at that location</string>
 </resources>

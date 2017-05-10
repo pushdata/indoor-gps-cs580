@@ -18,11 +18,13 @@ public class FingerprintManager extends Application {
         db = new ResultDB(this);
     }
 
+    //Adding Fingerprint to database
     public void addFingerprint(Model model) {
         fingerprints.add(model);
         db.addFingerprint(model);
     }
 
+    //Get Fingerprint data of selected map area
     public ArrayList<Model> getFingerprintData(String map) {
         ArrayList<Model> fingerprintData = new ArrayList<Model>();
         for (Model Model : fingerprintData) {
@@ -34,19 +36,23 @@ public class FingerprintManager extends Application {
 
     }
 
+    //Get Fingerprint data without map
     public ArrayList<Model> getFingerprintData() {
         return fingerprints;
     }
 
+    //Get All Fingerprints from Database
     public void getFingerprintsFromDatabase() {
         fingerprints = db.getAllFingerprints();
     }
 
+    //Delete All Fingerprints from Database
     public void deleteAllFingerprints() {
         db.deleteAllFingerprints();
         fingerprints.clear();
     }
 
+    //Delete All Fingerprints matching selected area
     public void deleteAllFingerprints(String map) {
         fingerprintsToRemove = new ArrayList<Model>();
         for (Model model : fingerprints) {

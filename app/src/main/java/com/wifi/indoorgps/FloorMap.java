@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 
 /**
- * Created by samar on 5/7/2017.
+ * Created by samara on 5/7/2017.
  */
 
 public class FloorMap extends ImageView {
@@ -41,6 +41,7 @@ public class FloorMap extends ImageView {
 
     /** INSTANCE METHODS */
 
+    //Place the pointer on the Map at specified values
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -53,6 +54,7 @@ public class FloorMap extends ImageView {
         }
     }
 
+    //When user touches the map this method will get invoked
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         super.onTouchEvent(event);
@@ -72,12 +74,14 @@ public class FloorMap extends ImageView {
         return true;
     }
 
+    //Get X,Y Co-Ordinates of the pointer on the map
     public void onTouchStart(MotionEvent event) {
         mSavedMatrix.set(mMatrix);
         mStart.set(event.getX(), event.getY());
         mode = MAP_TOUCHED;
     }
 
+    //Triggered upon removing finger from the Map
     public void onTouchEnd() {
         mode = MAP_TOUCHED;
     }
@@ -87,7 +91,7 @@ public class FloorMap extends ImageView {
 
     }
 
-    //Set matrix with translated coordinates
+    //Set matrix with translated X,Y coordinates
     public void mapMove(MotionEvent event) {
         mMatrix.set(mSavedMatrix);
         mMatrix.postTranslate(event.getX() - mStart.x, event.getY() - mStart.y);
@@ -114,16 +118,14 @@ public class FloorMap extends ImageView {
         return wpView;
     }
 
-    //Place a marker on the MAP and set the pointer to GREEN
+    //Place the pointer on the MAP and set it to visible
     public WifiCapture createNewWifiPointOnMap(Model fingerprint, boolean visible) {
         WifiCapture wpView = createNewWifiPointOnMap(fingerprint);
         wpView.setVisible(visible);
         return wpView;
     }
 
-
-
-    /** set given WifiPointView to given location */
+    //Place a pointer on the map at specified location point
     public void setWifiPointViewPosition(WifiCapture pointer, PointF location) {
         float[] values = new float[9];
         mMatrix.getValues(values);
@@ -131,20 +133,24 @@ public class FloorMap extends ImageView {
         pointer.setLocation(location);
     }
 
+    //Return WifiCapture Objects
     public ArrayList<WifiCapture> getWifiPoints() {
         return mWifiPoints;
     }
 
+    //Set WifiCapture Objects
     public void setWifiPoints(ArrayList<WifiCapture> wifiPoints) {
         mWifiPoints = wifiPoints;
     }
 
+    //Set Wifi Points Visibility
     public void setWifiPointsVisibility(boolean visible) {
         for(WifiCapture point : mWifiPoints) {
             point.setVisible(visible);
         }
     }
 
+    //Delete selected WifiCapture objects
     public void deleteFingerprints() {
         ArrayList<WifiCapture> itemsToRemove = new ArrayList<WifiCapture>();
         for (WifiCapture point : mWifiPoints) {

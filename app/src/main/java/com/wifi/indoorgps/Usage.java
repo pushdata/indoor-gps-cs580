@@ -21,21 +21,25 @@ public class Usage extends AppCompatActivity {
 
     }
 
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
     }
 
+    //Set Vibration pattern for Kitchen
     public void kitchen(View view) {
         long[] pattern = new long[]{0, 400, 1000};
         v.vibrate(pattern, -1);
     }
 
+    //Set Vibration pattern for Hall
     public void hall(View view) {
         long[] pattern = new long[]{0, 1000, 1000};
         v.vibrate(pattern, -1);
     }
 
+    //Set Vibration pattern for Bedroom
     public void bedroom(View view) {
         long[] pattern = new long[]{0, 100, 1000};
         v.vibrate(pattern, -1);

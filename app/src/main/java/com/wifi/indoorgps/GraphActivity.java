@@ -39,9 +39,10 @@ public class GraphActivity extends Activity implements OnTouchListener {
 
         mApplication = (FingerprintManager) getApplication();
         wifi = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        this.setMap(R.mipmap.floor); // set map to default location (== first floor)
+        this.setMap(R.mipmap.floor); //Set Map Background
     }
 
+    //Create Broadcast Receiver to receive scan results when they are available
     public void onStart() {
         super.onStart();
 
@@ -62,6 +63,7 @@ public class GraphActivity extends Activity implements OnTouchListener {
 
     }
 
+    //Triggered upon Touching the Map
     public boolean onTouch(View v, MotionEvent event) {
         v.onTouchEvent(event);
 
@@ -86,10 +88,12 @@ public class GraphActivity extends Activity implements OnTouchListener {
         return super.onOptionsItemSelected(item);
     }
 
+    //Refresh the Map Screen to update the pointer location by redrawing the Map
     public void refreshMap() {
-        mMap.invalidate(); // redraws the map screen
+        mMap.invalidate();
     }
 
+    //Set the Default Map and Scale it to Fit the Device Screen
     public void setMap(int resId) {
         areaSelected = String.valueOf(resId);
         mMap.setImageResource(resId); // change map image

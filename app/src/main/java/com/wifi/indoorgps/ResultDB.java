@@ -26,6 +26,7 @@ public class ResultDB extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, 1);
     }
 
+    //Creating 2 Tables to store Fingerprints(Offline phase) and Query Phase Readings
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(FINGERPRINTS_TABLE_CREATE);
@@ -39,6 +40,7 @@ public class ResultDB extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    //Delete Specific Fingerprint Data
     public void deleteFingerprint(Model fingerprint) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -51,6 +53,7 @@ public class ResultDB extends SQLiteOpenHelper {
         db.close();
     }
 
+    //Delete All Fingerprints
     public void deleteAllFingerprints() {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(FINGERPRINTS_TABLE, null, null); // delete all fingerprints
@@ -58,6 +61,7 @@ public class ResultDB extends SQLiteOpenHelper {
         db.close();
     }
 
+    //Add Specific Fingerprint Data
     public void addFingerprint(Model fingerprint) {
         SQLiteDatabase db = this.getWritableDatabase();
         PointF location = fingerprint.getLocation();
@@ -85,6 +89,7 @@ public class ResultDB extends SQLiteOpenHelper {
         db.close();
     }
 
+    //Get Specific Fingerprint Data By Providing Fingerprint ID
     public Model getFingerprint(int id) {
 
         SQLiteDatabase db = this.getReadableDatabase();
@@ -107,6 +112,7 @@ public class ResultDB extends SQLiteOpenHelper {
         return fingerprint;
     }
 
+    //Retrieve All Fingerprints from the Database
     public ArrayList<Model> getAllFingerprints() {
         SQLiteDatabase db = this.getWritableDatabase();
         HashMap<String, Integer> measurements = null;
@@ -129,6 +135,7 @@ public class ResultDB extends SQLiteOpenHelper {
         return fingerprints;
     }
 
+    //Get Readings from Database by providing fingerprint ID
     public HashMap<String, Integer> getMeasurements(int fingerprintId) {
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -151,6 +158,7 @@ public class ResultDB extends SQLiteOpenHelper {
         return measurements;
     }
 
+    //Return Fingerprint Count from Offline Phase
     public int getFingerprintCount() {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery("select *from " + FINGERPRINTS_TABLE, null); // SQL query

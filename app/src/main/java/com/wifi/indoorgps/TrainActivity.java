@@ -23,16 +23,13 @@ import java.util.TimerTask;
 import java.util.TreeSet;
 
 public class TrainActivity extends GraphActivity {
-    private static final int MENU_ITEM_SCAN = 31;
-    private static final int MENU_ITEM_DELETE_FINGERPRINTS = 32;
-    private static final int MENU_ITEM_EXIT = 33;
-    private static final int MIN_SCAN_COUNT = 3; // minimum amount of scans required the scan to be successful
-    private static final int SCAN_COUNT = 3; // how many scans will be done for calculating average for scan results
-    private static final int SCAN_INTERVAL = 500; // interval between scans (milliseconds)
+    private static final int MIN_SCAN_COUNT = 3; // minimum amount of scans
+    private static final int SCAN_COUNT = 3; // No. of Scans performed for calculating average of RSSI values
+    private static final int SCAN_INTERVAL = 500; // Scan Interval in ms
     private String location_name = "";
     private int mScansLeft = 0;
 
-    // UI pointer to visualize user where in the screen a new fingerprint will be added after scan
+    //Pointer on the Screen where the fingerprint will be stored
     private WifiCapture mPointer;
 
     private long mTouchStarted; // used for detecting tap events
@@ -42,7 +39,6 @@ public class TrainActivity extends GraphActivity {
     private HashMap<String, Integer> readings; // for storing measurement data during the scan
 
     private boolean mShowFingerprints = true;
-
 
 
     /** INSTANCE METHODS */
@@ -59,11 +55,12 @@ public class TrainActivity extends GraphActivity {
 
     @Override
     public void onReceiveWifiScanResults(List<ScanResult> results) {
-        if(mScansLeft != 0 && mPointer != null) { // get scan results only when scan was started from this activity
-            if(results.size() >= MIN_SCAN_COUNT) { // accept only scans with enough found access points
+        if (mScansLeft != 0 && mPointer != null) {
+            //Store results only when there are more than 3 APs
+            if (results.size() >= MIN_SCAN_COUNT) {
                 mScansLeft--;
 
-                // add scan results to hashmap
+                //Store RSSI values to Hashmap
                 HashMap<String, Integer> measurements = new HashMap<String, Integer>();
                 for (ScanResult result : results) {
                     measurements.put(result.BSSID, result.level);
@@ -73,12 +70,11 @@ public class TrainActivity extends GraphActivity {
                 keys.addAll(measurements.keySet());
                 keys.addAll(readings.keySet());
 
-                // go through scans results and calculate new sum values for each measurement
+                //Go through RSSI Values and calculate measurement for each Value
                 for (String key : keys) {
                     Integer value = measurements.get(key);
                     Integer oldValue = readings.get(key);
-
-                    // calculate new value for each measurement (sum of all part-scans)
+                    // calculate new value for each RSSI Value
                     if(oldValue == null) {
                         readings.put(key, value + (-119 * (SCAN_COUNT - 1 - mScansLeft)));
                     } else if(value == null) {
@@ -88,25 +84,27 @@ public class TrainActivity extends GraphActivity {
                     }
                 }
 
-                if(mScansLeft > 0) { // keep on scanning
+                //Keep Scanning
+                if (mScansLeft > 0) {
                     scanNext();
-                } else { // calculate averages from sum values of measurements and add them to fingerprint
-                    // calculate average for each measurement
+                } else {
+                    //Calculate Average Readings of User Fingerprints(Online Phase) by dividing RSSI by 3
                     for (String key : readings.keySet()) {
                         int value = (int) readings.get(key) / SCAN_COUNT;
                         readings.put(key, value);
                     }
 
-                    Model f = new Model(readings, areaSelected, location_name); // create fingerprint with the calculated measurement averages
-                    f.setLocation(mPointer.getLocation()); // set the fingerprint to UI pointer location
-                    mMap.createNewWifiPointOnMap(f, mShowFingerprints); // add to map UI
-                    mApplication.addFingerprint(f); // add to database
-                    mLoadingDialog.dismiss(); // hide loading bar
+                    Model f = new Model(readings, areaSelected, location_name);
+                    f.setLocation(mPointer.getLocation());
+                    mMap.createNewWifiPointOnMap(f, mShowFingerprints);
+                    mApplication.addFingerprint(f);
+                    mLoadingDialog.dismiss();
                 }
-            } else { // did not find enough access points, show error to user
+            } else {
+                //Not Enough APs found
                 mLoadingDialog.dismiss(); // hide loading bar
-                Toast.makeText(getApplicationContext(), "Failed to create fingerprint. Could not find enough access points (found "
-                        + results.size() + ", need at least " + MIN_SCAN_COUNT + ").", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Failed to Create Fingerprint because of insufficient access points (Found "
+                        + results.size() + ", Require at least " + MIN_SCAN_COUNT + ").", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -144,10 +142,11 @@ public class TrainActivity extends GraphActivity {
                 builder.show();
                 break;
             case MotionEvent.ACTION_UP:
-                if (event.getEventTime() - mTouchStarted < 150) { // user tapped the screen
-                    PointF location = new PointF(event.getX(), event.getY()); // get touch location
-
-                    // add pointer on screen where the user tapped and start wifi scan
+                //User Tap Detected
+                if (event.getEventTime() - mTouchStarted < 150) {
+                    // Get Touch Location and extract Co-Ordinates
+                    PointF location = new PointF(event.getX(), event.getY());
+                    // Add Bitmap pointer on the map and start wifi scan
                     if(mPointer == null) {
                         mPointer = mMap.createNewWifiPointOnMap(location);
                         mPointer.setLocation_name(location_name);
@@ -155,54 +154,54 @@ public class TrainActivity extends GraphActivity {
                     } else {
                         mMap.setWifiPointViewPosition(mPointer, location);
                     }
-                    refreshMap(); // redraw map
+                    refreshMap(); // Redraws map
                 }
                 break;
         }
 
-        return true; // indicate event was handled
+        return true;
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // add menu items
-        menu.add(Menu.NONE, MENU_ITEM_SCAN, Menu.NONE, "Scan");
-        menu.add(Menu.NONE, MENU_ITEM_DELETE_FINGERPRINTS, Menu.NONE, "Delete all fingerprints");
-        menu.add(Menu.NONE, MENU_ITEM_EXIT, Menu.NONE, "Exit Training mode");
+        menu.add(Menu.NONE, 31, Menu.NONE, "Scan");
+        menu.add(Menu.NONE, 32, Menu.NONE, "Delete all fingerprints");
+        menu.add(Menu.NONE, 33, Menu.NONE, "Exit Training mode");
         super.onCreateOptionsMenu(menu); // items for changing map
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
         switch (item.getItemId()) {
-            case MENU_ITEM_SCAN: // start scan
+            case 31:
                 if (mPointer == null && location_name != null) {
-                    // notify user that UI pointer must be positioned first before the scan can be started
                     Toast.makeText(getApplicationContext(), "Please Enter location by placing the pointer on screen", Toast.LENGTH_LONG).show();
                 } else {
-                    startScan(); // show loading dialog and start wifi scan
+                    startScan();
                 }
                 return true;
-            case MENU_ITEM_DELETE_FINGERPRINTS: // delete all fingerprints (from screen and database)
+            case 32:
                 deleteAllFingerprints();
                 return true;
-            case MENU_ITEM_EXIT: // exit edit mode
+            case 33:
                 finish();
                 return true;
-            default: // change map
+            default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
+    //Start Scan and Show Scanning Dialog
     public void startScan() {
         mScansLeft = SCAN_COUNT;
         readings = new HashMap<String, Integer>();
-        mLoadingDialog = ProgressDialog.show(this, "", "Scanning..", true); // show loading bar
+        mLoadingDialog = ProgressDialog.show(this, "", "Scanning...", true); // show loading bar
         wifi.startScan();
     }
 
+    //Create Timer to Schedule Scan at specified Scan Intervals
     public void scanNext() {
         Timer timer = new Timer();
 
@@ -216,12 +215,13 @@ public class TrainActivity extends GraphActivity {
         }, SCAN_INTERVAL);
     }
 
-
+    //Delete All Fingerprints from the Screen and Also From the Database
     public void deleteAllFingerprints() {
         mMap.deleteFingerprints(); // delete fingerprints from the screen
         mApplication.deleteAllFingerprints(); // delete fingerprints from the database
     }
 
+    //Set Map Background By Providing Resource ID
     @Override
     public void setMap(int resId) {
         super.setMap(resId);

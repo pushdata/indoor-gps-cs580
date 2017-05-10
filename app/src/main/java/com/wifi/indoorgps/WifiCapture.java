@@ -38,7 +38,6 @@ public class WifiCapture extends View{
         mPaint.setColor(INACTIVE_COLOR);
         mPaint.setTextSize(25);
         mPaint.setAntiAlias(true);
-
         floorMapActive = false;
         floorMapVisible = true;
         mRadius = 10f;
@@ -46,10 +45,12 @@ public class WifiCapture extends View{
         mFingerprint = null;
     }
 
+    //Get location name
     public String getLocation_name() {
         return location_name;
     }
 
+    //Set location name for Toast
     public void setLocation_name(String location_name) {
         this.location_name = location_name;
     }
@@ -60,12 +61,13 @@ public class WifiCapture extends View{
         super.onDraw(canvas);
     }
 
+    //Draw the BitMap pointer on the screen at specified X,Y Co-Ordinates
     protected void drawWithTransformations(Canvas canvas, float[] matrixValues) {
         RelativeXCoord = matrixValues[2] + floorMapLocation.x * matrixValues[0];
         RelativeYCoord = matrixValues[5] + floorMapLocation.y * matrixValues[4];
 
-        if (floorMapVisible == true) { // draw only if set visible
-            if (floorMapActive) { // choose draw color based on active state
+        if (floorMapVisible == true) {
+            if (floorMapActive) {
                 mPaint.setColor(ACTIVE_COLOR);
             } else {
                 mPaint.setColor(INACTIVE_COLOR);
@@ -74,11 +76,10 @@ public class WifiCapture extends View{
             Bitmap bitmap = BitmapFactory.decodeResource(res, R.drawable.human);
             bitmap = getResizedBitmap(bitmap, 150, 100);
             canvas.drawBitmap(bitmap, RelativeXCoord, RelativeYCoord, mPaint);
-            //canvas.drawRect(RelativeXCoord, RelativeYCoord, RelativeXCoord+width, RelativeYCoord+height, mPaint);
-            //canvas.drawCircle(RelativeXCoord, RelativeYCoord, mRadius, mPaint);
         }
     }
 
+    //Get resized version of Bitmap icon which is used as pointer
     public Bitmap getResizedBitmap(Bitmap bm, int newWidth, int newHeight) {
         int width = bm.getWidth();
         int height = bm.getHeight();
@@ -95,28 +96,30 @@ public class WifiCapture extends View{
         bm.recycle();
         return resizedBitmap;
     }
+
+    //Get Co-ordinates of location
     public PointF getLocation() {
         return floorMapLocation;
     }
 
+    //Set Location Co-ordinates of pointer
     public void setLocation(PointF location) {
         floorMapLocation = location;
     }
 
-    public void setSize(float radius) {
-        mRadius = radius;
-    }
-
+    //Get Fingerprint data
     public Model getFingerprint() {
         return mFingerprint;
     }
 
+    //Set Fingerprint data of the location
     public void setFingerprint(Model fingerprint) {
         location_name = fingerprint.getLocation_name();
         mFingerprint = fingerprint;
         floorMapLocation = fingerprint.getLocation();
     }
 
+    //Activate the pointer and set its visibility on screen
     public void activate() {
         floorMapActive = true;
     }
@@ -125,6 +128,7 @@ public class WifiCapture extends View{
         floorMapActive = false;
     }
 
+    //Set the pointer visibility on screen
     public void setVisible(boolean visible) {
         floorMapVisible = visible;
     }
